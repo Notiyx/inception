@@ -52,5 +52,15 @@ networks:
     driver: bridge
 
 volumes:
-  mariadb:
   wordpress:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/tlonghin/Documents/wordpress'
+  mariadb:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/tlonghin/Documents/mariadb'
