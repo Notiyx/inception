@@ -3,14 +3,19 @@ FROM debian:buster
 RUN apt update -y && \
     apt upgrade -y && \
     apt install -y nginx openssl && \
-    mkdir -p /etc/nginx/ssl && \
-    mkdir -p /var/run/nginx && \
-    openssl req -x509 -nodes -days 365 -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=BG/L=Paris/O=42/OU=42/CN=tlonghin.42.fr/UID=tlonghin" && \
-    mkdir -p /var/www/html && \
-    chmod 755 /var/www/html && \
-    chown -R www-data:www-data /var/www/html
+    mkdir -p /etc/nginx/ssl /var/run/nginx /var/www/html && \
+    openssl req -x509 -nodes -days 365 \
+      -out /etc/nginx/ssl/inception.crt \
+      -keyout /etc/nginx/ssl/inception.key \
+      -subj "/C=FR/ST=BG/L=Paris/O=42/OU=42/CN=tlonghin.42.fr/UID=tlonghin"
 
-COPY ./conf/nginx.conf /etc/nginx/conf.d
+COPY ./conf/nginx.conf /etc/nginx/conf.d/
+
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html && \
+    chown -R root:root /etc/nginx/ssl && \
+    chmod 600 /etc/nginx/ssl/inception.key && \
+    chmod 644 /etc/nginx/ssl/inception.crt
 
 EXPOSE 443
 
