@@ -1,58 +1,85 @@
-version: '3.8'
 
 services:
   nginx:
-    build: ./requirements/nginx
+    build: ./requirements/nginx/
     container_name: nginx
+    env_file:
+      - ./.env
+    depends_on:
+      - wordpress
     ports:
       - "443:443"
     volumes:
-      - ./data/nginx/html:/var/www/html
+      - wordpress:/var/www/wordpress
     networks:
-      - app-network
-    restart: always
-
+      - tlonghin-net
+    restart: on-failure
+  mariadb:
+    build: ./requirements/mariadb
+    container_name: mariadb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb:/var/lib/mysql
+    secrets:
+      - db_password
+      - db_root_password
+    env_file:
+      - ./.env
+    networks:
+      - tlonghin-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
     volumes:
-      - wordpress_data:/var/www/html
-    environment:
-      - SQL_USER=${SQL_USER}
-      - SQL_PASSWORD=${SQL_PASSWORD}
-      - SQL_DATABASE=${SQL_DATABASE}
-      - WP_ADMIN_USER=${WP_ADMIN_USER}
-      - WP_ADMIN_PASSWORD=${WP_ADMIN_PASSWORD}
-      - WP_ADMIN_EMAIL=${WP_ADMIN_EMAIL}
-      - WP_HOME=${WP_HOME}
-      - WP_SITEURL=${WP_SITEURL}
-      - PHP_MEMORY_LIMIT=${PHP_MEMORY_LIMIT}
-      - PHP_UPLOAD_MAX_FILESIZE=${PHP_UPLOAD_MAX_FILESIZE}
-      - PHP_POST_MAX_SIZE=${PHP_POST_MAX_SIZE}
+      - wordpress:/var/www/wordpress
+    secrets:
+      - db_password
+      - admin_pass
+      - user_pass
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    env_file:
+      - ./.env
     networks:
-      - app-network
-    restart: always
-
-  mariadb:
-    build: ./requirements/mariadb
-    container_name: mariadb
-    environment:
-      - MYSQL_ROOT_PASSWORD=${SQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${SQL_DATABASE}
-      - MYSQL_USER=${SQL_USER}
-      - MYSQL_PASSWORD=${SQL_PASSWORD}
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - app-network
-    restart: always
-
-networks:
-  app-network:
-    driver: bridge
+      - tlonghin-net
+    ports:
+      - "9000:9000"
+    restart: on-failure
+  
 
 volumes:
-  wordpress_data:
+  wordpress:
     driver: local
-  mariadb_data:
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/tlonghin/data/wordpress'
+  mariadb:
     driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/tlonghin/data/mariadb'
+
+networks:
+  tlonghin-net:
+    driver: bridge
+
+secrets:
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  db_password:
+    file: ../secrets/db_password.txt
+  admin_pass:
+    file: ../secrets/admin_pass.txt
+  user_pass:
+    file: ../secrets/user_pass.txt
