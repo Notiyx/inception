@@ -28,7 +28,7 @@ services:
       - ./.env
     networks:
       - tlonghin-net
-    restart: unless-stopped
+    restart: on-failure
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -51,9 +51,9 @@ services:
       - ./.env
     networks:
       - tlonghin-net
+    restart: on-failure
     ports:
       - "9000:9000"
-    restart: on-failure
   
 
 volumes:

@@ -18,7 +18,7 @@ RUN wget https://fr.wordpress.org/wordpress-6.8.1-fr_FR.tar.gz -P /var/www \
 
 COPY ./conf/php.conf /etc/php/7.4/fpm/pool.d/www.conf
 
-RUN chown -R root:root /var/www/wordpress
+RUN chown -R www-data:www-data /var/www/wordpress
 
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
 	&& chmod +x wp-cli.phar \
