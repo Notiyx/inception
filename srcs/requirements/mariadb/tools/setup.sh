@@ -11,8 +11,7 @@ myDB_install_db --user=mysql --datadir=/var/lib/mysql
 mysqld_safe --user=mysql --datadir=/var/lib/mysql &
 
 while ! mysqladmin ping --silent; do
-	echo "Waiting for MySQL to start..."
-	sleep 2
+	sleep 1
 done
 
 mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE}\`;"

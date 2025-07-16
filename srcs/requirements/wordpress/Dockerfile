@@ -1,6 +1,6 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+RUN apt update && apt upgrade -y && apt install -y \
 	--no-install-recommends apt-utils \
 	wget \
 	php7.4 \
@@ -8,13 +8,13 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 	php7.4-mysql \
     ca-certificates \
 	mariadb-client \
-	&& apt-get clean \
+	&& apt clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN wget https://fr.wordpress.org/wordpress-6.8.1-fr_FR.tar.gz -P /var/www \
+RUN wget https://fr.wordpress.org/wordpress-6.8.2-fr_FR.tar.gz -P /var/www \
 	&& cd /var/www \
-	&& tar -xzf wordpress-6.8.1-fr_FR.tar.gz \
-	&& rm wordpress-6.8.1-fr_FR.tar.gz
+	&& tar -xzf wordpress-6.8.2-fr_FR.tar.gz \
+	&& rm wordpress-6.8.2-fr_FR.tar.gz
 
 COPY ./conf/php.conf /etc/php/7.4/fpm/pool.d/www.conf
 

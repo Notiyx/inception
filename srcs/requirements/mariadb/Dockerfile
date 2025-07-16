@@ -1,10 +1,10 @@
 FROM debian:bullseye
 
-RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
+RUN apt update -y && apt upgrade -y && apt install -y \
 	--no-install-recommends apt-utils \
 	mariadb-server \
 	mariadb-client \
-	&& apt-get clean \
+	&& apt clean \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /run/mysqld \
